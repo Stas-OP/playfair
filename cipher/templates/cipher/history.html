@@ -1,0 +1,46 @@
+{% extends 'cipher/base.html' %}
+
+{% block title %}История запросов{% endblock %}
+
+{% block content %}
+<h2>История запросов</h2>
+<table class="table">
+    <thead>
+        <tr>
+            <th>Тип запроса</th>
+            <th>Дата и время</th>
+        </tr>
+    </thead>
+    <tbody>
+    {% for item in history %}
+        <tr>
+            <td>{{ item.request_type }}</td>
+            <td>{{ item.timestamp }}</td>
+        </tr>
+    {% empty %}
+        <tr>
+            <td colspan="2">История запросов пуста.</td>
+        </tr>
+    {% endfor %}
+    </tbody>
+</table>
+<button id="clear-history" class="btn btn-danger">Очистить историю</button>
+
+<script>
+document.getElementById('clear-history').addEventListener('click', function() {
+    if (confirm('Вы уверены, что хотите очистить историю?')) {
+        fetch('/api/history/', {
+            method: 'DELETE',
+            headers: {
+                'X-CSRFToken': '{{ csrf_token }}'
+            }
+        })
+        .then(response => response.json())
+        .then(data => {
+            alert(data.message);
+            location.reload();
+        });
+    }
+});
+</script>
+{% endblock %}

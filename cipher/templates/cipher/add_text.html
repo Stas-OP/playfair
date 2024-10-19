@@ -1,0 +1,39 @@
+{% extends 'cipher/base.html' %}
+
+{% block title %}Добавить текст{% endblock %}
+
+{% block content %}
+<h2>Добавить новый текст</h2>
+<form id="add-text-form">
+    <div class="mb-3">
+        <label for="title" class="form-label">Название</label>
+        <input type="text" class="form-control" id="title" required>
+    </div>
+    <div class="mb-3">
+        <label for="content" class="form-label">Содержание</label>
+        <textarea class="form-control" id="content" rows="5" required></textarea>
+    </div>
+    <button type="submit" class="btn btn-primary">Добавить текст</button>
+</form>
+
+<script>
+document.getElementById('add-text-form').addEventListener('submit', function(e) {
+    e.preventDefault();
+    const title = document.getElementById('title').value;
+    const content = document.getElementById('content').value;
+    fetch('/api/text/', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+            'X-CSRFToken': '{{ csrf_token }}'
+        },
+        body: JSON.stringify({title: title, content: content})
+    })
+    .then(response => response.json())
+    .then(data => {
+        alert('Текст успешно добавлен');
+        window.location.href = '/texts/';
+    });
+});
+</script>
+{% endblock %}

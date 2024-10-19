@@ -1,0 +1,50 @@
+{% extends 'cipher/base.html' %}
+
+{% block title %}Тексты{% endblock %}
+
+{% block content %}
+<h2>Мои тексты</h2>
+<a href="{% url 'add_text_page' %}" class="btn btn-primary mb-3">Добавить текст</a>
+<div id="text-list"></div>
+
+<script>
+function loadTexts() {
+    fetch('/api/text/')
+        .then(response => response.json())
+        .then(data => {
+            const textList = document.getElementById('text-list');
+            textList.innerHTML = '';
+            data.texts.forEach(text => {
+                const div = document.createElement('div');
+                div.className = 'card mb-3';
+                div.innerHTML = `
+                    <div class="card-body">
+                        <h5 class="card-title">${text.title}</h5>
+                        <p class="card-text">${text.content.substring(0, 100)}...</p>
+                        <a href="/texts/${text.id}/" class="btn btn-sm btn-info">Просмотр</a>
+                        <button class="btn btn-sm btn-danger delete-text" data-id="${text.id}">Удалить</button>
+                    </div>
+                `;
+                textList.appendChild(div);
+            });
+        });
+}
+
+document.addEventListener('click', function(e) {
+    if (e.target.classList.contains('delete-text')) {
+        const id = e.target.getAttribute('data-id');
+        if (confirm('Вы уверены, что хотите удалить этот текст?')) {
+            fetch(`/api/text/${id}/`, {
+                method: 'DELETE',
+                headers: {
+                    'X-CSRFToken': '{{ csrf_token }}'
+                }
+            })
+            .then(() => loadTexts());
+        }
+    }
+});
+
+loadTexts();
+</script>
+{% endblock %}

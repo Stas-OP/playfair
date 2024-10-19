@@ -1,0 +1,80 @@
+{% extends 'cipher/base.html' %}
+
+{% block title %}Зашифровать{% endblock %}
+
+{% block content %}
+<h2>Зашифровать текст</h2>
+<form id="encrypt-form">
+    <div class="mb-3">
+        <label for="key" class="form-label">Ключ</label>
+        <input type="text" class="form-control" id="key" required>
+    </div>
+    <div class="mb-3">
+        <label for="text" class="form-label">Текст для шифрования</label>
+        <textarea class="form-control" id="text" rows="5" required></textarea>
+    </div>
+    <button type="submit" class="btn btn-primary">Зашифровать</button>
+</form>
+
+<div id="result" style="display: none;">
+    <h3>Результат:</h3>
+    <textarea class="form-control mb-3" id="encrypted-text" rows="5" readonly></textarea>
+    <button id="copy-button" class="btn btn-secondary">Копировать</button>
+    <button id="save-button" class="btn btn-success">Сохранить</button>
+</div>
+
+<script>
+document.getElementById('encrypt-form').addEventListener('submit', function(e) {
+    e.preventDefault();
+    const key = document.getElementById('key').value;
+    const text = document.getElementById('text').value;
+    fetch('/api/encrypt/', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+            'X-CSRFToken': '{{ csrf_token }}'
+        },
+        body: JSON.stringify({key: key, text: text})
+    })
+    .then(response => response.json())
+    .then(data => {
+        document.getElementById('encrypted-text').value = data.encrypted;
+        document.getElementById('result').style.display = 'block';
+    });
+});
+
+document.getElementById('copy-button').addEventListener('click', function() {
+    const encryptedText = document.getElementById('encrypted-text');
+    encryptedText.select();
+    document.execCommand('copy');
+    alert('Текст скопирован в буфер обмена');
+});
+
+document.getElementById('save-button').addEventListener('click', function() {
+    const encryptedText = document.getElementById('encrypted-text').value;
+    const originalText = document.getElementById('text').value;
+    const key = document.getElementById('key').value;
+    const title = prompt('Введите название для сохранения текста:');
+    if (title) {
+        fetch('/api/text/', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-CSRFToken': '{{ csrf_token }}'
+            },
+            body: JSON.stringify({
+                title: title, 
+                content: encryptedText,
+                original_content: originalText,
+                key: key, 
+                is_encrypted: true
+            })
+        })
+        .then(response => response.json())
+        .then(data => {
+            alert('Текст успешно сохранен');
+        });
+    }
+});
+</script>
+{% endblock %}

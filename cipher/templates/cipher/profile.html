@@ -1,0 +1,69 @@
+{% extends 'cipher/base.html' %}
+
+{% block title %}Профиль{% endblock %}
+
+{% block content %}
+<h2>Профиль пользователя</h2>
+<p>Имя пользователя: {{ user.username }}</p>
+<h3>Изменить пароль</h3>
+<form id="change-password-form">
+    <div class="mb-3">
+        <label for="old-password" class="form-label">Текущий пароль</label>
+        <input type="password" class="form-control" id="old-password" required>
+    </div>
+    <div class="mb-3">
+        <label for="new-password" class="form-label">Новый пароль</label>
+        <input type="password" class="form-control" id="new-password" required>
+    </div>
+    <div class="mb-3">
+        <label for="confirm-password" class="form-label">Подтвердите новый пароль</label>
+        <input type="password" class="form-control" id="confirm-password" required>
+    </div>
+    <button type="submit" class="btn btn-primary">Изменить пароль</button>
+</form>
+
+<hr>
+<a href="{% url 'logout' %}" class="btn btn-danger">Выход</a>
+
+<script>
+document.getElementById('change-password-form').addEventListener('submit', function(e) {
+    e.preventDefault();
+    const oldPassword = document.getElementById('old-password').value;
+    const newPassword = document.getElementById('new-password').value;
+    const confirmPassword = document.getElementById('confirm-password').value;
+
+    if (newPassword !== confirmPassword) {
+        alert('Новые пароли не совпадают');
+        return;
+    }
+
+    fetch('/api/change_password/', {
+        method: 'PATCH',
+        headers: {
+            'Content-Type': 'application/json',
+            'X-CSRFToken': '{{ csrf_token }}'
+        },
+        body: JSON.stringify({
+            old_password: oldPassword,
+            new_password: newPassword
+        })
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.message) {
+            alert(data.message);
+            // Обновляем токен в localStorage, если он там хранится
+            if (data.new_token) {
+                localStorage.setItem('token', data.new_token);
+            }
+            // Очищаем форму
+            document.getElementById('change-password-form').reset();
+        } else if (data.error) {
+            alert(data.error);
+        } else {
+            alert('Произошла ошибка при изменении пароля');
+        }
+    });
+});
+</script>
+{% endblock %}
