@@ -1,12 +1,46 @@
-
 {% extends 'cipher/base.html' %}
 
+{% block title %}Главная - Шифр Плейфера{% endblock %}
+
 {% block content %}
-<h1>Добро пожаловать в приложение Шифр Плейфера</h1>
-<p>Выберите действие:</p>
-<ul>
-    <li><a href="/encrypt">Зашифровать текст</a></li>
-    <li><a href="/decrypt">Расшифровать текст</a></li>
-    <li><a href="/history">Просмотреть историю</a></li>
-</ul>
+<div class="jumbotron text-center">
+    <h1 class="display-4">Добро пожаловать в мир шифра Плейфера</h1>
+    <p class="lead">Безопасное шифрование и дешифрование текста с помощью классического метода</p>
+    {% if not user.is_authenticated %}
+        <hr class="my-4">
+        <p>Начните использовать наш сервис прямо сейчас!</p>
+        <a class="btn btn-primary btn-lg" href="{% url 'register' %}" role="button">Зарегистрироваться</a>
+        <a class="btn btn-secondary btn-lg" href="{% url 'login' %}" role="button">Войти</a>
+    {% endif %}
+</div>
+
+<div class="row mt-5">
+    <div class="col-md-4">
+        <h3>Что такое шифр Плейфера?</h3>
+        <p>Шифр Плейфера - это метод шифрования, в котором буквы шифруются попарно. Изобретён в 1854 году Чарльзом Уитстоном, но назван в честь лорда Лайона Плейфера.</p>
+    </div>
+    <div class="col-md-4">
+        <h3>Как это работает?</h3>
+        <p>Шифр использует 5x5 матрицу букв, составленную с помощью ключевого слова. Пары букв в сообщении шифруются с использованием правил, основанных на их положении в матрице.</p>
+    </div>
+    <div class="col-md-4">
+        <h3>Преимущества</h3>
+        <ul>
+            <li>Простота использования</li>
+            <li>Устойчивость к простому частотному анализу</li>
+            <li>Историческая значимость</li>
+        </ul>
+    </div>
+</div>
+
+{% if user.is_authenticated %}
+<div class="row mt-5">
+    <div class="col-md-12 text-center">
+        <h3>Начните работу</h3>
+        <p>Теперь, когда вы вошли в систему, вы можете начать шифровать и дешифровать тексты:</p>
+        <a href="{% url 'encrypt_page' %}" class="btn btn-primary">Зашифровать текст</a>
+        <a href="{% url 'decrypt_page' %}" class="btn btn-secondary">Расшифровать текст</a>
+    </div>
+</div>
+{% endif %}
 {% endblock %}

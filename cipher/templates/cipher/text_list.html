@@ -3,7 +3,7 @@
 {% block title %}Тексты{% endblock %}
 
 {% block content %}
-<h2>Мои тексты</h2>
+<h2 class="mb-4">Мои тексты</h2>
 <a href="{% url 'add_text_page' %}" class="btn btn-primary mb-3">Добавить текст</a>
 <div id="text-list"></div>
 
@@ -22,20 +22,20 @@ function loadTexts() {
                         <div class="card-body">
                             <h5 class="card-title">${text.title}</h5>
                             <p class="card-text">${text.content ? text.content.substring(0, 100) + '...' : 'Нет содержания'}</p>
-                            <a href="/texts/${text.id}/" class="btn btn-sm btn-info">Просмотр</a>
+                            <a href="/texts/${text.id}/" class="btn btn-sm btn-primary">Просмотр</a>
                             <button class="btn btn-sm btn-danger delete-text" data-id="${text.id}">Удалить</button>
                         </div>
                     `;
                     textList.appendChild(div);
                 });
             } else {
-                textList.innerHTML = '<p>У вас пока нет сохраненных текстов.</p>';
+                textList.innerHTML = '<p class="text-muted">У вас пока нет сохраненных текстов.</p>';
             }
         })
         .catch(error => {
             console.error('Error:', error);
             const textList = document.getElementById('text-list');
-            textList.innerHTML = '<p>Произошла ошибка при загрузке текстов. Пожалуйста, попробуйте позже.</p>';
+            textList.innerHTML = '<p class="text-danger">Произошла ошибка при загрузке текстов. Пожалуйста, попробуйте позже.</p>';
         });
 }
 
