@@ -10,6 +10,12 @@
         <input type="text" class="form-control" id="key" required>
     </div>
     <div class="mb-3">
+        <label for="text-select" class="form-label">Выберите текст</label>
+        <select class="form-select" id="text-select">
+            <option value="">Ввести новый текст</option>
+        </select>
+    </div>
+    <div class="mb-3" id="text-input-container">
         <label for="text" class="form-label">Текст для шифрования</label>
         <textarea class="form-control" id="text" rows="5" required></textarea>
     </div>
@@ -24,6 +30,38 @@
 </div>
 
 <script>
+// Загрузка текстов для выбора
+fetch('/api/text/')
+    .then(response => response.json())
+    .then(data => {
+        const select = document.getElementById('text-select');
+        data.texts.forEach(text => {
+            const option = document.createElement('option');
+            option.value = text.id;
+            option.textContent = text.title;
+            select.appendChild(option);
+        });
+    });
+
+// Обработка выбора текста
+document.getElementById('text-select').addEventListener('change', function() {
+    const textInputContainer = document.getElementById('text-input-container');
+    const textInput = document.getElementById('text');
+    if (this.value) {
+        textInputContainer.style.display = 'none';
+        textInput.removeAttribute('required');
+        fetch(`/api/text/${this.value}/`)
+            .then(response => response.json())
+            .then(data => {
+                textInput.value = data.content;
+            });
+    } else {
+        textInputContainer.style.display = 'block';
+        textInput.setAttribute('required', '');
+        textInput.value = '';
+    }
+});
+
 document.getElementById('encrypt-form').addEventListener('submit', function(e) {
     e.preventDefault();
     const key = document.getElementById('key').value;

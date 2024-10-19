@@ -25,7 +25,7 @@ def history_page(request):
     return render(request, 'cipher/history.html', {'history': history})
 
 def prepare_key(key):
-    key = key.upper().replace("J", "I")
+    key = ''.join(filter(str.isalpha, key.upper())).replace("J", "I")
     key = "".join(dict.fromkeys(key))
     alphabet = "ABCDEFGHIKLMNOPQRSTUVWXYZ"
     key += "".join(letter for letter in alphabet if letter not in key)
@@ -33,7 +33,7 @@ def prepare_key(key):
 
 def playfair_cipher(key, text, mode='encrypt'):
     key_matrix = prepare_key(key)
-    text = text.upper().replace("J", "I")
+    text = ''.join(filter(str.isalpha, text.upper())).replace("J", "I")
     if len(text) % 2 != 0:
         text += 'X'
     
@@ -213,7 +213,12 @@ def manage_text(request, text_id=None):
     elif request.method == 'GET':
         if text_id:
             text = Text.objects.get(id=text_id, user=request.user)
-            return JsonResponse({'id': text.id, 'title': text.title, 'content': text.content})
+            return JsonResponse({
+                'id': text.id,
+                'title': text.title,
+                'content': text.content,
+                'key': text.key
+            })
         else:
             texts = Text.objects.filter(user=request.user)
-            return JsonResponse({'texts': list(texts.values())})
+            return JsonResponse({'texts': list(texts.values('id', 'title', 'content'))})

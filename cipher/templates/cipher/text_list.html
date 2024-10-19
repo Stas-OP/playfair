@@ -14,19 +14,28 @@ function loadTexts() {
         .then(data => {
             const textList = document.getElementById('text-list');
             textList.innerHTML = '';
-            data.texts.forEach(text => {
-                const div = document.createElement('div');
-                div.className = 'card mb-3';
-                div.innerHTML = `
-                    <div class="card-body">
-                        <h5 class="card-title">${text.title}</h5>
-                        <p class="card-text">${text.content.substring(0, 100)}...</p>
-                        <a href="/texts/${text.id}/" class="btn btn-sm btn-info">Просмотр</a>
-                        <button class="btn btn-sm btn-danger delete-text" data-id="${text.id}">Удалить</button>
-                    </div>
-                `;
-                textList.appendChild(div);
-            });
+            if (data.texts && data.texts.length > 0) {
+                data.texts.forEach(text => {
+                    const div = document.createElement('div');
+                    div.className = 'card mb-3';
+                    div.innerHTML = `
+                        <div class="card-body">
+                            <h5 class="card-title">${text.title}</h5>
+                            <p class="card-text">${text.content ? text.content.substring(0, 100) + '...' : 'Нет содержания'}</p>
+                            <a href="/texts/${text.id}/" class="btn btn-sm btn-info">Просмотр</a>
+                            <button class="btn btn-sm btn-danger delete-text" data-id="${text.id}">Удалить</button>
+                        </div>
+                    `;
+                    textList.appendChild(div);
+                });
+            } else {
+                textList.innerHTML = '<p>У вас пока нет сохраненных текстов.</p>';
+            }
+        })
+        .catch(error => {
+            console.error('Error:', error);
+            const textList = document.getElementById('text-list');
+            textList.innerHTML = '<p>Произошла ошибка при загрузке текстов. Пожалуйста, попробуйте позже.</p>';
         });
 }
 
@@ -40,7 +49,17 @@ document.addEventListener('click', function(e) {
                     'X-CSRFToken': '{{ csrf_token }}'
                 }
             })
-            .then(() => loadTexts());
+            .then(response => {
+                if (response.ok) {
+                    loadTexts();
+                } else {
+                    alert('Произошла ошибка при удалении текста');
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                alert('Произошла ошибка при удалении текста');
+            });
         }
     }
 });

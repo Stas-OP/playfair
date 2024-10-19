@@ -4,6 +4,7 @@
 
 {% block content %}
 <h2>История запросов</h2>
+<button id="clear-history" class="btn btn-danger mb-3">Очистить историю</button>
 <table class="table">
     <thead>
         <tr>
@@ -24,11 +25,10 @@
     {% endfor %}
     </tbody>
 </table>
-<button id="clear-history" class="btn btn-danger">Очистить историю</button>
 
 <script>
 document.getElementById('clear-history').addEventListener('click', function() {
-    if (confirm('Вы уверены, что хотите очистить историю?')) {
+    if (confirm('Вы уверены, что хотите очистить всю историю?')) {
         fetch('/api/history/', {
             method: 'DELETE',
             headers: {
