@@ -7,6 +7,9 @@ from django.contrib.auth.decorators import login_required  # Добавьте э
 from .models import UserProfile, Text, RequestHistory
 import json
 import uuid
+import random
+import string
+from django.views.decorators.http import require_http_methods
 
 def index(request):
     return render(request, 'cipher/index.html')
@@ -62,14 +65,27 @@ def playfair_cipher(key, text, mode='encrypt'):
     
     return result
 
+def generate_random_key(length=10):
+    """
+    Генерирует случайный ключ заданной длины.
+    По умолчанию длина ключа - 10 символов.
+    """
+    alphabet = string.ascii_uppercase.replace('J', '')  # Удаляем 'J' из алфавита
+    return ''.join(random.choice(alphabet) for _ in range(length))
+
 @csrf_exempt
 def encrypt_text(request):
     if request.method == 'POST':
         data = json.loads(request.body)
         text = data.get('text')
         key = data.get('key')
+        
+        if not key:
+            key = generate_random_key()  # Генерируем случайный ключ, если он не предоставлен
+        
         encrypted = playfair_cipher(key, text, mode='encrypt')
-        RequestHistory.objects.create(user=request.user, request_type='Шифрование')
+        if request.user.is_authenticated:
+            RequestHistory.objects.create(user=request.user, request_type='Шифрование')
         return JsonResponse({'encrypted': encrypted, 'key': key})
 
 @csrf_exempt
@@ -222,3 +238,8 @@ def manage_text(request, text_id=None):
         else:
             texts = Text.objects.filter(user=request.user)
             return JsonResponse({'texts': list(texts.values('id', 'title', 'content'))})
+
+@require_http_methods(["GET"])
+def generate_key(request):
+    key = generate_random_key()
+    return JsonResponse({'key': key})

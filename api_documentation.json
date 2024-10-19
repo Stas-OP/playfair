@@ -138,6 +138,14 @@
       "response": {
         "decrypted": "string"
       }
+    },
+    {
+      "path": "/generate_key/",
+      "method": "GET",
+      "description": "Генерация случайного ключа",
+      "response": {
+        "key": "string"
+      }
     }
   ]
 }

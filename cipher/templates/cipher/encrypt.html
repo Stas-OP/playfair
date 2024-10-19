@@ -7,7 +7,10 @@
 <form id="encrypt-form">
     <div class="mb-3">
         <label for="key" class="form-label">Ключ</label>
-        <input type="text" class="form-control" id="key" required>
+        <div class="input-group">
+            <input type="text" class="form-control" id="key" required>
+            <button class="btn btn-outline-secondary" type="button" id="generate-key">Сгенерировать ключ</button>
+        </div>
     </div>
     <div class="mb-3">
         <label for="text-select" class="form-label">Выберите текст</label>
@@ -113,6 +116,19 @@ document.getElementById('save-button').addEventListener('click', function() {
             alert('Текст успешно сохранен');
         });
     }
+});
+
+document.getElementById('generate-key').addEventListener('click', function() {
+    fetch('/api/generate_key/', {
+        method: 'GET',
+        headers: {
+            'X-CSRFToken': '{{ csrf_token }}'
+        }
+    })
+    .then(response => response.json())
+    .then(data => {
+        document.getElementById('key').value = data.key;
+    });
 });
 </script>
 {% endblock %}

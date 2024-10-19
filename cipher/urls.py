@@ -21,4 +21,5 @@ urlpatterns = [
     path('api/decrypt/', views.decrypt_text, name='decrypt_text'),
     path('texts/<int:text_id>/', views.view_text_page, name='view_text'),
     path('profile/', views.profile_page, name='profile'),
+    path('api/generate_key/', views.generate_key, name='generate_key'),
 ]
