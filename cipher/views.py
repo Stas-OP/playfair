@@ -77,6 +77,14 @@ def generate_random_key(length=10):
 def contains_cyrillic(text):
     return bool(re.search('[а-яА-Я]', text))
 
+def generate_playfair_matrix(key):
+    key = ''.join(filter(str.isalpha, key.upper())).replace("J", "I")
+    key = "".join(dict.fromkeys(key))
+    alphabet = "ABCDEFGHIKLMNOPQRSTUVWXYZ"
+    key += "".join(letter for letter in alphabet if letter not in key)
+    matrix = [key[i:i+5] for i in range(0, 25, 5)]
+    return matrix
+
 @csrf_exempt
 def encrypt_text(request):
     if request.method == 'POST':
@@ -255,3 +263,13 @@ def manage_text(request, text_id=None):
 def generate_key(request):
     key = generate_random_key()
     return JsonResponse({'key': key})
+
+@csrf_exempt
+def get_playfair_matrix(request):
+    if request.method == 'POST':
+        data = json.loads(request.body)
+        key = data.get('key')
+        if contains_cyrillic(key):
+            return JsonResponse({'error': 'Ключ должен содержать только английские буквы'}, status=400)
+        matrix = generate_playfair_matrix(key)
+        return JsonResponse({'matrix': matrix})

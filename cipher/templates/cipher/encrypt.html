@@ -12,6 +12,12 @@
             <button class="btn btn-outline-secondary" type="button" id="generate-key">Сгенерировать ключ</button>
         </div>
     </div>
+    <button type="button" class="btn btn-outline-primary btn-sm mb-2" id="toggle-matrix">Показать матрицу</button>
+    <div id="matrix-container" style="display: none;" class="mb-3">
+        <table id="playfair-matrix" style="border-collapse: collapse; border: 1px solid #dee2e6;">
+            <!-- Матрица будет добавлена здесь с помощью JavaScript -->
+        </table>
+    </div>
     <div class="mb-3">
         <label for="text-select" class="form-label">Выберите текст</label>
         <select class="form-select" id="text-select">
@@ -133,6 +139,52 @@ document.getElementById('generate-key').addEventListener('click', function() {
     .then(data => {
         document.getElementById('key').value = data.key;
     });
+});
+
+document.getElementById('toggle-matrix').addEventListener('click', function() {
+    const matrixContainer = document.getElementById('matrix-container');
+    const key = document.getElementById('key').value;
+    if (!key) {
+        alert('Пожалуйста, введите ключ');
+        return;
+    }
+    if (matrixContainer.style.display === 'none') {
+        fetch('/api/get_playfair_matrix/', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-CSRFToken': '{{ csrf_token }}'
+            },
+            body: JSON.stringify({key: key})
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.error) {
+                alert(data.error);
+            } else {
+                const matrixTable = document.getElementById('playfair-matrix');
+                matrixTable.innerHTML = '';
+                data.matrix.forEach(row => {
+                    const tr = document.createElement('tr');
+                    row.split('').forEach(char => {
+                        const td = document.createElement('td');
+                        td.textContent = char;
+                        td.style.width = '30px';
+                        td.style.height = '30px';
+                        td.style.textAlign = 'center';
+                        td.style.border = 'none';
+                        tr.appendChild(td);
+                    });
+                    matrixTable.appendChild(tr);
+                });
+                matrixContainer.style.display = 'block';
+                this.textContent = 'Скрыть матрицу';
+            }
+        });
+    } else {
+        matrixContainer.style.display = 'none';
+        this.textContent = 'Показать матрицу';
+    }
 });
 </script>
 {% endblock %}

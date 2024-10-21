@@ -22,4 +22,5 @@ urlpatterns = [
     path('texts/<int:text_id>/', views.view_text_page, name='view_text'),
     path('profile/', views.profile_page, name='profile'),
     path('api/generate_key/', views.generate_key, name='generate_key'),
+    path('api/get_playfair_matrix/', views.get_playfair_matrix, name='get_playfair_matrix'),
 ]
