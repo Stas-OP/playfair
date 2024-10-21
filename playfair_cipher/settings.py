@@ -98,5 +98,4 @@ LOGIN_URL = '/login/'
 LOGIN_REDIRECT_URL = '/'
 LOGOUT_REDIRECT_URL = '/'
 
-# Добавьте эт�� строку, чтобы разрешить все домены
 CSRF_TRUSTED_ORIGINS = ['https://*', 'http://*']
