@@ -8,6 +8,11 @@
         <div class="card shadow">
             <div class="card-body">
                 <h2 class="card-title text-center mb-4">Вход</h2>
+                {% if error_message %}
+                    <div class="alert alert-danger" role="alert">
+                        {{ error_message }}
+                    </div>
+                {% endif %}
                 <form method="post">
                     {% csrf_token %}
                     <div class="mb-3">

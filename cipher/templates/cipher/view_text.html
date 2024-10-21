@@ -23,7 +23,7 @@
     <h3>Редактировать текст</h3>
     <form id="edit-text-form">
         <div class="mb-3">
-            <label for="edit-title" class="form-label">Название</label>
+            <label for="edit-title" class="form-label">Наименование</label>
             <input type="text" class="form-control" id="edit-title" value="{{ text.title }}" required>
         </div>
         <div class="mb-3">
@@ -57,14 +57,19 @@ document.getElementById('edit-text-form').addEventListener('submit', function(e)
     const title = document.getElementById('edit-title').value;
     const content = document.getElementById('edit-content').value;
     const key = document.getElementById('edit-key') ? document.getElementById('edit-key').value : null;
-    const isEncrypted = {{ text.is_encrypted|yesno:"true,false" }};
+    const isEncrypted = {% if text.is_encrypted %}true{% else %}false{% endif %};
     fetch('/api/text/{{ text.id }}/', {
         method: 'PATCH',
         headers: {
             'Content-Type': 'application/json',
             'X-CSRFToken': '{{ csrf_token }}'
         },
-        body: JSON.stringify({title: title, content: content, key: key, is_encrypted: isEncrypted})
+        body: JSON.stringify({
+            title: title,
+            content: content,
+            key: key,
+            is_encrypted: isEncrypted
+        })
     })
     .then(response => response.json())
     .then(data => {

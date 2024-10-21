@@ -11,6 +11,7 @@ import random
 import string
 from django.views.decorators.http import require_http_methods
 import re
+from django.db import IntegrityError
 
 def index(request):
     return render(request, 'cipher/index.html')
@@ -124,10 +125,13 @@ def register_user(request):
         data = json.loads(request.body)
         username = data.get('username')
         password = data.get('password')
-        user = User.objects.create_user(username=username, password=password)
-        profile = UserProfile.objects.create(user=user)
-        login(request, user)
-        return JsonResponse({'token': str(profile.token)})
+        try:
+            user = User.objects.create_user(username=username, password=password)
+            profile = UserProfile.objects.create(user=user)
+            login(request, user)
+            return JsonResponse({'token': str(profile.token)})
+        except IntegrityError:
+            return JsonResponse({'error': 'Пользователь с таким именем уже существует'}, status=400)
 
 @csrf_exempt
 def user_history(request):
@@ -273,3 +277,15 @@ def get_playfair_matrix(request):
             return JsonResponse({'error': 'Ключ должен содержать только английские буквы'}, status=400)
         matrix = generate_playfair_matrix(key)
         return JsonResponse({'matrix': matrix})
+
+def login_view(request):
+    if request.method == 'POST':
+        username = request.POST['username']
+        password = request.POST['password']
+        user = authenticate(request, username=username, password=password)
+        if user is not None:
+            login(request, user)
+            return redirect('index')  # или куда вы хотите перенаправить после успешного входа
+        else:
+            return render(request, 'cipher/login.html', {'error_message': 'Неправильное имя пользователя или пароль'})
+    return render(request, 'cipher/login.html')

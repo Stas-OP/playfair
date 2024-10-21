@@ -8,6 +8,7 @@
         <div class="card shadow">
             <div class="card-body">
                 <h2 class="card-title text-center mb-4">Регистрация</h2>
+                <div id="error-message" class="alert alert-danger" style="display: none;"></div>
                 <form id="register-form">
                     <div class="mb-3">
                         <label for="username" class="form-label">Имя пользователя</label>
@@ -39,7 +40,7 @@ document.getElementById('register-form').addEventListener('submit', function(e) 
     const confirmPassword = document.getElementById('confirm-password').value;
 
     if (password !== confirmPassword) {
-        alert('Пароли не совпадают');
+        showError('Пароли не совпадают');
         return;
     }
 
@@ -50,14 +51,22 @@ document.getElementById('register-form').addEventListener('submit', function(e) 
     })
     .then(response => response.json())
     .then(data => {
-        if (data.token) {
+        if (data.error) {
+            showError(data.error);
+        } else if (data.token) {
             localStorage.setItem('token', data.token);
             alert('Регистрация успешна!');
             window.location.href = '/';
         } else {
-            alert('Ошибка при регистрации');
+            showError('Произошла ошибка при регистрации');
         }
     });
 });
+
+function showError(message) {
+    const errorDiv = document.getElementById('error-message');
+    errorDiv.textContent = message;
+    errorDiv.style.display = 'block';
+}
 </script>
 {% endblock %}
