@@ -10,6 +10,7 @@ import uuid
 import random
 import string
 from django.views.decorators.http import require_http_methods
+import re
 
 def index(request):
     return render(request, 'cipher/index.html')
@@ -73,12 +74,18 @@ def generate_random_key(length=10):
     alphabet = string.ascii_uppercase.replace('J', '')  # Удаляем 'J' из алфавита
     return ''.join(random.choice(alphabet) for _ in range(length))
 
+def contains_cyrillic(text):
+    return bool(re.search('[а-яА-Я]', text))
+
 @csrf_exempt
 def encrypt_text(request):
     if request.method == 'POST':
         data = json.loads(request.body)
         text = data.get('text')
         key = data.get('key')
+        
+        if contains_cyrillic(text) or contains_cyrillic(key):
+            return JsonResponse({'error': 'Шифр работает только с английским языком'}, status=400)
         
         if not key:
             key = generate_random_key()  # Генерируем случайный ключ, если он не предоставлен
@@ -94,8 +101,13 @@ def decrypt_text(request):
         data = json.loads(request.body)
         text = data.get('text')
         key = data.get('key')
+        
+        if contains_cyrillic(text) or contains_cyrillic(key):
+            return JsonResponse({'error': 'Шифр работает только с английским языком'}, status=400)
+        
         decrypted = playfair_cipher(key, text, mode='decrypt')
-        RequestHistory.objects.create(user=request.user, request_type='Дешифрование')
+        if request.user.is_authenticated:
+            RequestHistory.objects.create(user=request.user, request_type='Дешифрование')
         return JsonResponse({'decrypted': decrypted, 'key': key})
 
 @csrf_exempt

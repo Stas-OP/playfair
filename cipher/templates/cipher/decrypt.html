@@ -81,11 +81,15 @@ document.getElementById('decrypt-form').addEventListener('submit', function(e) {
     })
     .then(response => response.json())
     .then(data => {
-        document.getElementById('decrypted-text').value = data.decrypted;
-        document.getElementById('result').style.display = 'block';
-        // Сохраняем выбранный текст и ключ
-        document.getElementById('text').value = text;
-        document.getElementById('key').value = key;
+        if (data.error) {
+            alert(data.error);
+        } else {
+            document.getElementById('decrypted-text').value = data.decrypted;
+            document.getElementById('result').style.display = 'block';
+            // Сохраняем выбранный текст и ключ
+            document.getElementById('text').value = text;
+            document.getElementById('key').value = key;
+        }
     });
 });
 

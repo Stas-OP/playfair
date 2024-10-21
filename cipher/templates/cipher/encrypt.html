@@ -79,8 +79,12 @@ document.getElementById('encrypt-form').addEventListener('submit', function(e) {
     })
     .then(response => response.json())
     .then(data => {
-        document.getElementById('encrypted-text').value = data.encrypted;
-        document.getElementById('result').style.display = 'block';
+        if (data.error) {
+            alert(data.error);
+        } else {
+            document.getElementById('encrypted-text').value = data.encrypted;
+            document.getElementById('result').style.display = 'block';
+        }
     });
 });
 
