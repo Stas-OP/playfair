@@ -4,12 +4,12 @@ import uuid
 
 class Text(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE)
-    title = models.CharField(max_length=200)  # Добавляем поле для названия
+    title = models.CharField(max_length=200)  
     content = models.TextField()
-    original_content = models.TextField(blank=True, null=True)  # Добавляем поле для исходного текста
-    key = models.CharField(max_length=200, blank=True, null=True)  # Добавляем поле для ключа
-    is_encrypted = models.BooleanField(default=False)  # Флаг, указывающий, зашифрован ли текст
-    is_manually_added = models.BooleanField(default=True)  # Новое поле
+    original_content = models.TextField(blank=True, null=True) 
+    key = models.CharField(max_length=200, blank=True, null=True)  
+    is_encrypted = models.BooleanField(default=False) 
+    is_manually_added = models.BooleanField(default=True)  
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
 

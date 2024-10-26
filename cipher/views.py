@@ -68,10 +68,6 @@ def playfair_cipher(key, text, mode='encrypt'):
     return result
 
 def generate_random_key(length=10):
-    """
-    Генерирует случайный ключ заданной длины.
-    По умолчанию длина ключа - 10 символов.
-    """
     alphabet = string.ascii_uppercase.replace('J', '')  # Удаляем 'J' из алфавита
     return ''.join(random.choice(alphabet) for _ in range(length))
 
@@ -97,7 +93,7 @@ def encrypt_text(request):
             return JsonResponse({'error': 'Шифр работает только с английским языком'}, status=400)
         
         if not key:
-            key = generate_random_key()  # Генерируем случайный ключ, если он не предоставлен
+            key = generate_random_key()  
         
         encrypted = playfair_cipher(key, text, mode='encrypt')
         if request.user.is_authenticated:
@@ -285,7 +281,7 @@ def login_view(request):
         user = authenticate(request, username=username, password=password)
         if user is not None:
             login(request, user)
-            return redirect('index')  # или куда вы хотите перенаправить после успешного входа
+            return redirect('index')  
         else:
             return render(request, 'cipher/login.html', {'error_message': 'Неправильное имя пользователя или пароль'})
     return render(request, 'cipher/login.html')
